@@ -26,7 +26,7 @@ module DataMapper
       # add methods
       Array(options[:methods]).each do |method|
         next unless respond_to?(method)
-        result[method] = __send__(method)
+        result[method] = __send__(method).to_json(:to_json => false)
       end
 
       # Note: if you want to include a whole other model via relation, use :methods
