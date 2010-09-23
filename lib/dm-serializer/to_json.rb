@@ -26,7 +26,15 @@ module DataMapper
       # add methods
       Array(options[:methods]).each do |method|
         next unless respond_to?(method)
-        result[method] = __send__(method).to_json(:to_json => false)
+        # the below converts methods that result in DataMapper relationships to have to_json
+        # called on them, otherwise will just return the raw value of the method so that
+        # those values aren't double escaped
+        val = __send__(method)
+        if val.is_a?(DataMapper::Resource) || val.is_a?(DataMapper::Collection)
+          result[method] = val.to_json(:to_json => false)
+        else
+          result[method] = val
+        end
       end
 
       # Note: if you want to include a whole other model via relation, use :methods
